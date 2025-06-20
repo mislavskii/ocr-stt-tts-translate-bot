@@ -64,6 +64,15 @@ async def service(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         # await send_choices(message, context, choices)
         # return
         # (You need to adapt these to async)
+        r = dlp.retry_or_none(rq.get, 3, 1, file.file_path, timeout=30)
+        if not r:
+            send_failure_note(message, context)
+            return
+        results_dict[message.from_user.id] = await do_recognize(r, message, context)  # TODO: catch exception, notify user
+        suggestions = results_dict[message.from_user.id]
+        choices = generate_choices(suggestions)
+        await send_choices(message, context, choices)
+        return
     else:
         await send_baffled(message, context)
         return
