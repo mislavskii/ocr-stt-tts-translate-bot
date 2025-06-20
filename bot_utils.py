@@ -44,24 +44,6 @@ MAX_LENGTH = 4096
 LOOKUP_TAIL = '...\nclick the link below for more'
 FAILURE = 'something went wrong.'
 
-# Pre-assign menu text
-FIRST_MENU = "<b>Menu 1</b>\n\nA beautiful menu with a shiny inline button."
-SECOND_MENU = "<b>Menu 2</b>\n\nA better menu with even more shiny inline buttons."
-
-# Pre-assign button text
-NEXT_BUTTON = "Next"
-BACK_BUTTON = "Back"
-TUTORIAL_BUTTON = "Tutorial"
-
-# Build keyboards
-FIRST_MENU_MARKUP = InlineKeyboardMarkup([[
-    InlineKeyboardButton(NEXT_BUTTON, callback_data=NEXT_BUTTON)
-]])
-SECOND_MENU_MARKUP = InlineKeyboardMarkup([
-    [InlineKeyboardButton(BACK_BUTTON, callback_data=BACK_BUTTON)],
-    [InlineKeyboardButton(TUTORIAL_BUTTON, url="https://core.telegram.org/bots/tutorial")]
-])
-
 
 def send_compressed_confirmation(message, context):
     """
