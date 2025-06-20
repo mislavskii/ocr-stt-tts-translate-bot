@@ -1,0 +1,90 @@
+import logging
+from telegram import Update
+from telegram.constants import ParseMode
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
+)
+
+from bot_config import token
+from bot_utils import *  # Make sure all your bot_utils functions are compatible with v20+
+
+# Setup logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
+# Handlers must be async in v20+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logger.info(f'/start command issued by {update.effective_user.full_name}')
+    try:
+        await update.message.reply_text(
+            START_MESSAGE,
+            parse_mode=ParseMode.MARKDOWN
+        )
+        logger.info(f'start message sent to {update.effective_user.full_name}')
+    except Exception as e:
+        logger.warning(f'failed sending start message to {update.effective_user.full_name}: {e}')
+        await send_failure_note(update.message, context)
+
+
+async def service(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    message = update.message
+    if message.text:
+        logger.info(f'incoming text message from {update.effective_user.full_name}')
+        word = obtain_query(message)
+        if word:
+            await do_lookup(message, context, word)
+        else:
+            await send_hint(message, context)
+    elif message.photo or message.document:
+        file = None
+        if message.photo:
+            logger.info(f'incoming photo from {update.effective_user.full_name} detected by service handler.')
+            file = await context.bot.get_file(message.photo[0].file_id)
+            await send_compressed_confirmation(message, context)
+        elif message.document:
+            logger.info(f'incoming file from {update.effective_user.full_name} detected by service handler.')
+            file = await context.bot.get_file(message.document.file_id)
+            if file.file_path.endswith('.png') or file.file_path.endswith('.jpg'):
+                await send_uncompressed_confirmation(message, context)
+            else:
+                await send_rejection_note(message, context)
+                return
+        logger.info(f'loading {file.file_path}')
+        # Replace dlp.retry_or_none and rq.get with async equivalents if possible
+        # results_dict[message.from_user.id] = await do_recognize(...)
+        # suggestions = results_dict[message.from_user.id]
+        # choices = generate_choices(suggestions)
+        # await send_choices(message, context, choices)
+        # return
+        # (You need to adapt these to async)
+    else:
+        await send_baffled(message, context)
+        return
+
+async def simulated_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    raise Exception('Intentional error for testing purposes')
+
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
+    logger.error(f"Update {getattr(update, 'update_id', None)} caused error: {context.error}")
+    # Optionally send a message to the user
+
+def main() -> None:
+    app = ApplicationBuilder().token(token).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("error", simulated_error))
+    app.add_handler(MessageHandler(filters.ALL, service))
+
+    app.add_error_handler(error_handler)
+
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()
