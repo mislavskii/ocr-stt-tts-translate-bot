@@ -72,44 +72,6 @@ def service(update: Update, context: CallbackContext) -> None:
         return
 
 
-def menu(update: Update, context: CallbackContext) -> None:  # Not yet implemented
-    """
-    This handler sends a menu with the pre-assigned inline buttons
-    """
-    context.bot.send_message(
-        update.message.from_user.id,
-        FIRST_MENU,
-        parse_mode=ParseMode.HTML,
-        reply_markup=FIRST_MENU_MARKUP
-    )
-
-
-def button_tap(update: Update, context: CallbackContext) -> None:  # Not yet implemented
-    """
-    This handler processes the inline buttons on the menu
-    """
-    data = update.callback_query.data
-    text = ''
-    markup = None
-
-    if data == NEXT_BUTTON:
-        text = SECOND_MENU
-        markup = SECOND_MENU_MARKUP
-    elif data == BACK_BUTTON:
-        text = FIRST_MENU
-        markup = FIRST_MENU_MARKUP
-
-    # Close the query to end the client-side loading animation
-    update.callback_query.answer()
-
-    # Update message content with corresponding menu section
-    update.callback_query.message.edit_text(
-        text,
-        ParseMode.HTML,
-        reply_markup=markup
-    )
-
-
 def simulated_error(update: Update, context: CallbackContext):
     raise Exception('Intentional error for testing purposes')
 
