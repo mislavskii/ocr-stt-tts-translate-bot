@@ -114,7 +114,7 @@ def send_rejection_note(message, context):
     return sent
 
 
-def send_failure_note(message, context):
+async def send_failure_note(message, context):
     """
     Notifies user that requested action could not be successfully accomplished,
     retrying once in case of initial failure.
@@ -122,7 +122,7 @@ def send_failure_note(message, context):
     :param context: instance of telegram.ext.CallbackContext containing the running Bot as a property.
     :returns: sent message in case of success, None otherwise.
     """
-    sent = dlp.retry_or_none(
+    sent = await dlp.retry_or_none(
         context.bot.send_message, 2, 1,
         message.from_user.id,
         'Something went wrong... Please consider trying one more time '
@@ -232,8 +232,8 @@ async def do_lookup(message, context, query: str):
                              )
     logger.info(f'notification sent successfully to {message.from_user.full_name}' if sent else FAILURE)
     x = dlp()
-    if not x.lookup(query):
-        return send_failure_note(message, context)
+    if not await x.lookup(query):
+        return await send_failure_note(message, context)
     output = trim_output(x.output_markdown())
     logger.info(
         f'markdown output generated ({output[:128] if len(output) > 128 else output} ...)'
