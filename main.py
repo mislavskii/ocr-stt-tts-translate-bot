@@ -12,12 +12,6 @@ from telegram.ext import (
 from bot_config import token
 from bot_utils import *  # Make sure all your bot_utils functions are compatible with v20+
 
-# Setup logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-logger = logging.getLogger(__name__)
 
 # Handlers must be async in v20+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

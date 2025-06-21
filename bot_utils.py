@@ -1,5 +1,6 @@
 # https://github.com/python-telegram-bot/python-telegram-bot/discussions/2876#discussion-3831621
 import logging
+from datetime import datetime as dt
 from io import BytesIO
 import requests as rq
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton  # , ParseMode
@@ -12,9 +13,11 @@ results_dict = {}  # store bot recognition results
 # https://www.youtube.com/watch?v=9L77QExPmI0
 # TODO: Make it roll
 logging.basicConfig(format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
-                    filename=f'logs/{__name__}.log', encoding='utf-8',
+                    filename=f'logs/{__name__}_{dt.now():%Y%m%d-%H%M%S}.log', encoding='utf-8',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 tb_logger.name = f'{__name__}_tb_logger'
 tb_logger.handlers.clear()
