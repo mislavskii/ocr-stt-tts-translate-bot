@@ -1,3 +1,6 @@
+import tracemalloc
+tracemalloc.start()
+
 import logging
 from telegram import Update
 from telegram.constants import ParseMode
