@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import inspect
 import logging
 import os
@@ -259,7 +260,8 @@ class DictLookup(ClipImg2Text):
                 else:
                     # Run the sync function in a thread pool executor
                     loop = asyncio.get_running_loop()
-                    return await loop.run_in_executor(None, func, *args, **kwargs)
+                    wrapped_func = functools.partial(func, *args, **kwargs)
+                    return await loop.run_in_executor(None, wrapped_func)
             except Exception as e:
                 logger.error(f"Attempt {i+1}/{attempts} failed: {e}")
                 tb_logger.exception(e)
