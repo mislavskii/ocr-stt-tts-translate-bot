@@ -21,7 +21,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 tb_logger.name = f'{__name__}_tb_logger'
 tb_logger.handlers.clear()
-exception_handler = logging.FileHandler(f'logs/{__name__}_exception.log', encoding='utf-8')
+exception_handler = logging.FileHandler(f'logs/{__name__}_{dt.now():%Y%m%d-%H%M%S}_exception.log', encoding='utf-8')
 exception_handler.setLevel(logging.ERROR)
 exception_formatter = logging.Formatter('\n%(asctime)s [%(name)s] %(levelname)s: %(message)s\n%(exc_info)s')
 exception_handler.setFormatter(exception_formatter)
