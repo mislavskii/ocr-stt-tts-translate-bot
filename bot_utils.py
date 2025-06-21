@@ -132,7 +132,7 @@ async def send_failure_note(message, context):
     return sent
 
 
-def do_recognize(r: rq.Response, message, context) -> list[tuple[str, float]]:
+async def do_recognize(r: rq.Response, message, context) -> list[tuple[str, float]]:
     """
     Pulls response content into PIL Image object, runs recognition and generates suggestions with
     provisional confidence rating as a list of tuples.
@@ -149,7 +149,7 @@ def do_recognize(r: rq.Response, message, context) -> list[tuple[str, float]]:
         tb_logger.exception(e)
         return []
     logger.info('initiating recognition...')
-    send_processing_note(message, context)
+    await send_processing_note(message, context)
     try:
         x.threads_recognize(lang='tha', kind='line')
     except Exception as e:
