@@ -1,8 +1,10 @@
+import asyncio
 import logging
 import os
 import threading
 import time
 from datetime import datetime as dt
+from typing import Any
 import pytesseract
 import requests as rq
 from IPython.display import HTML
@@ -239,9 +241,9 @@ class DictLookup(ClipImg2Text):
     dic_url = 'https://dict2013.longdo.com/search/'
 
     @staticmethod
-    def retry_or_none(func, attempts: int, seconds: int | float, *args, **kwargs):
+    async def retry_or_none(func, attempts: int, seconds: int | float, *args, **kwargs) -> Any | None:
         """
-        Tries to call a function repeatedly until success or exhaustion of attempts, logging error on exception.
+        Tries to call the supplied function repeatedly until success or exhaustion of attempts, logging error on exception.
         :param func: function to call
         :param attempts: total number of calls
         :param seconds: wait time before next call
@@ -251,12 +253,12 @@ class DictLookup(ClipImg2Text):
         """
         for _ in range(attempts):
             try:
-                return func(*args, **kwargs)
+                return await func(*args, **kwargs)
             except Exception as e:
                 logger.error(e)
                 tb_logger.exception(e)
                 logger.info('retrying...')
-                time.sleep(seconds)
+                await asyncio.sleep(seconds)
                 continue
         return None
 
