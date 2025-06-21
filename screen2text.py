@@ -284,7 +284,7 @@ class DictLookup(ClipImg2Text):
             logger.warning("Couldn't fetch.")
             return False
         response.encoding = 'utf-8'
-        self.soup = bs(response.text, features="lxml")
+        self.soup = bs(response.text, features="html.parser")
         return True
 
     def output_html(self):
