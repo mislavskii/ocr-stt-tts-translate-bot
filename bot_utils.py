@@ -239,12 +239,12 @@ async def do_lookup(message, context, query: str):
         f'markdown output generated ({output[:128] if len(output) > 128 else output} ...)'
         .replace('\n', ' ')
     )
-    sent = await dlp.retry_or_none(context.bot.send_message, 2, 1,
-                             message.from_user.id,
-                             output,
-                             parse_mode=ParseMode.MARKDOWN,
-                             timeout=15
-                             )
+    sent = await dlp.retry_or_none(
+        context.bot.send_message, 2, 1,
+        message.from_user.id,
+        output,
+        parse_mode=ParseMode.MARKDOWN
+    )
     logger.info(f'and sent successfully to {message.from_user.full_name}' if sent else FAILURE)
     if not sent:
         output = trim_output(x.output_plain())

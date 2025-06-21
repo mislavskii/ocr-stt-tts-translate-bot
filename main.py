@@ -88,7 +88,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 
 def main() -> None:
-    app = ApplicationBuilder().token(token).build()
+    app = ApplicationBuilder().token(token).read_timeout(15).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("error", simulated_error))
