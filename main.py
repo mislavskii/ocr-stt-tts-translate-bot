@@ -63,7 +63,7 @@ async def service(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         # (You need to adapt these to async)
         r = dlp.retry_or_none(rq.get, 3, 1, file.file_path, timeout=30)
         if not r:
-            send_failure_note(message, context)
+            await send_failure_note(message, context)
             return
         results_dict[message.from_user.id] = await do_recognize(r, message, context)  # TODO: catch exception, notify user
         suggestions = results_dict[message.from_user.id]
@@ -77,9 +77,15 @@ async def service(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def simulated_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     raise Exception('Intentional error for testing purposes')
 
-async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
+async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = getattr(update, "message", None)
+    logger.info(f'error handler invoked in relation to {getattr(message, "text", "unknown message")}')
     logger.error(f"Update {getattr(update, 'update_id', None)} caused error: {context.error}")
+    tb_logger.error(context.error, exc_info=True)
     # Optionally send a message to the user
+    if message:
+        await send_failure_note(message, context)
+    
 
 def main() -> None:
     app = ApplicationBuilder().token(token).build()
