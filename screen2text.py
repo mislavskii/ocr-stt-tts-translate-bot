@@ -267,11 +267,11 @@ class DictLookup(ClipImg2Text):
         self.word = None
         self.soup = None
 
-    def lookup(self, word):
+    async def lookup(self, word):
         self.soup = None
         self.word = word
         logger.info(f'Looking up {word}... ')
-        response = self.retry_or_none(rq.get, 3, 1, self.dic_url + word, timeout=15)
+        response = await self.retry_or_none(rq.get, 3, 1, self.dic_url + word, timeout=15)
         if not response or response.status_code != 200:
             logger.warning("Couldn't fetch.")
             return False
