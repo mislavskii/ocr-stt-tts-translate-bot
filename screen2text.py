@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import logging
 import os
 import threading
@@ -251,15 +252,20 @@ class DictLookup(ClipImg2Text):
         :param kwargs: keyword arguments for the called function
         :return: whatever the called function should return or None in case of ultimate failure
         """
-        for _ in range(attempts):
+        for i in range(attempts):
             try:
-                return await func(*args, **kwargs)
+                if inspect.iscoroutinefunction(func):
+                    return await func(*args, **kwargs)
+                else:
+                    # Run the sync function in a thread pool executor
+                    loop = asyncio.get_running_loop()
+                    return await loop.run_in_executor(None, func, *args, **kwargs)
             except Exception as e:
-                logger.error(e)
+                logger.error(f"Attempt {i+1}/{attempts} failed: {e}")
                 tb_logger.exception(e)
-                logger.info('retrying...')
-                await asyncio.sleep(seconds)
-                continue
+                if i < attempts - 1:
+                    logger.info('Retrying...')
+                    await asyncio.sleep(seconds)
         return None
 
     def __init__(self):
