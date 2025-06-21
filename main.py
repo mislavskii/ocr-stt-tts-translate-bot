@@ -12,7 +12,7 @@ from telegram.ext import (
     filters,
 )
 
-from bot_config import token
+from bot_config import *
 from bot_utils import *  # Make sure all your bot_utils functions are compatible with v20+
 
 
@@ -54,13 +54,6 @@ async def service(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 await send_rejection_note(message, context)
                 return
         logger.info(f'loading {file.file_path}')
-        # Replace dlp.retry_or_none and rq.get with async equivalents if possible
-        # results_dict[message.from_user.id] = await do_recognize(...)
-        # suggestions = results_dict[message.from_user.id]
-        # choices = generate_choices(suggestions)
-        # await send_choices(message, context, choices)
-        # return
-        # (You need to adapt these to async)
         r = await dlp.retry_or_none(rq.get, 3, 1, file.file_path, timeout=30)
         if not r:
             await send_failure_note(message, context)
