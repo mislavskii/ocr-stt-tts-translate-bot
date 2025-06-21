@@ -216,7 +216,7 @@ def obtain_query(message) -> str:
     return query
 
 
-def do_lookup(message, context, query: str):
+async def do_lookup(message, context, query: str):
     """
     Performs lookup for the query in online dictionary, prepares resulting output and sends it to user as
     formatted markdown or plain text as a fallback option.
@@ -226,7 +226,7 @@ def do_lookup(message, context, query: str):
     :return: sent message if anything managed to get through (albeit failure note) or None in case of ultimate failure.
     """
     logger.info(f'got a text to look up, initiating lookup for {query}')
-    sent = dlp.retry_or_none(context.bot.send_message, 2, 1,
+    sent = await dlp.retry_or_none(context.bot.send_message, 2, 1,
                              message.from_user.id,
                              f'looking up {query} ...'
                              )
@@ -239,7 +239,7 @@ def do_lookup(message, context, query: str):
         f'markdown output generated ({output[:128] if len(output) > 128 else output} ...)'
         .replace('\n', ' ')
     )
-    sent = dlp.retry_or_none(context.bot.send_message, 2, 1,
+    sent = await dlp.retry_or_none(context.bot.send_message, 2, 1,
                              message.from_user.id,
                              output,
                              parse_mode=ParseMode.MARKDOWN,
@@ -252,14 +252,14 @@ def do_lookup(message, context, query: str):
             f'plain output generated ({output[:128] if len(output) > 128 else output} ...)'
             .replace('\n', ' ')
         )
-        sent = dlp.retry_or_none(context.bot.send_message, 2, 1,
+        sent = await dlp.retry_or_none(context.bot.send_message, 2, 1,
                                  message.from_user.id,
                                  output,
                                  timeout=15
                                  )
         logger.info(f'and sent successfully to {message.from_user.full_name}' if sent else FAILURE)
     if not sent:
-        send_failure_note(message, context)
+        await send_failure_note(message, context)
     return sent
 
 
