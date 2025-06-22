@@ -1,7 +1,7 @@
 import tracemalloc
 tracemalloc.start()
 
-import logging
+import os
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -12,11 +12,10 @@ from telegram.ext import (
     filters,
 )
 
-from bot_config import *
-from bot_utils import *  # Make sure all your bot_utils functions are compatible with v20+
+from dotenv import load_dotenv
 
+from bot_utils import *  
 
-# Handlers must be async in v20+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.info(f'/start command issued by {update.effective_user.full_name}')
     try:
@@ -81,7 +80,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 
 def main() -> None:
-    app = ApplicationBuilder().token(token).read_timeout(15).build()
+    app = ApplicationBuilder().token(os.getenv("TOKEN")).read_timeout(15).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("error", simulated_error))

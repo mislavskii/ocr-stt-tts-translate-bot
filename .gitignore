@@ -3,3 +3,4 @@ bot_config.py
 logs/*
 ref/*
 bims/*
+.env
