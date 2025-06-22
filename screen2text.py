@@ -48,7 +48,7 @@ class ClipImg2Text:
      13    Raw line. Treat the image as a single text line, bypassing hacks that are Tesseract-specific."""
     config_dict = {int(entry[0]): entry[1] for entry in
                    [entry.strip().split('    ') for entry in config_codes.split('\n')]}
-    corpus_path = 'lexitron_thai.txt'
+    corpus_path = 'resources/lexitron_thai.txt'
     # any file with Thai dictionary words one per line will do
     # (the bigger - the better, this one is 42K+ from NECTEC's Lexitron)
 
