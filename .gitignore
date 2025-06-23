@@ -1,5 +1,5 @@
 __pycache__/*
-bot_config.py
+auth.py
 logs/*
 ref/*
 bims/*
