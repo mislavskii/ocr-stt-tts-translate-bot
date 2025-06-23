@@ -1,0 +1,22 @@
+name: Update Telegram Bot
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup SSH agent
+      uses: webfactory/ssh-agent@v0.8.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to VM
+      run: |
+        cd projects/ocr-stt-tts-translate-bot/
+        ssh -o StrictHostKeyChecking=no mcloud@82.202.138.187 'bash -s' < ./deploy/update.sh
