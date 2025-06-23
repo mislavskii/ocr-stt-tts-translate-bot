@@ -18,5 +18,5 @@ jobs:
 
     - name: Deploy to VM
       run: |
-        cd projects/ocr-stt-tts-translate-bot/
+        cd /home/mcloud/projects/ocr-stt-tts-translate-bot
         ssh -o StrictHostKeyChecking=no mcloud@82.202.138.187 'bash -s' < ./deploy/update.sh
