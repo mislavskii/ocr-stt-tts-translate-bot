@@ -4,3 +4,4 @@ logs/*
 ref/*
 bims/*
 .env
+*.db

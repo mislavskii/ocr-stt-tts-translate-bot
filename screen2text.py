@@ -3,6 +3,7 @@ import functools
 import inspect
 import logging
 import os
+import sqlite3
 import threading
 import time
 from datetime import datetime as dt
@@ -48,7 +49,7 @@ class ClipImg2Text:
      13    Raw line. Treat the image as a single text line, bypassing hacks that are Tesseract-specific."""
     config_dict = {int(entry[0]): entry[1] for entry in
                    [entry.strip().split('    ') for entry in config_codes.split('\n')]}
-    corpus_path = 'resources/lexitron_thai.txt'
+    corpus_path = 'resources/dictionary.db'
     # any file with Thai dictionary words one per line will do
     # (the bigger - the better, this one is 42K+ from NECTEC's Lexitron)
 
@@ -168,13 +169,18 @@ class ClipImg2Text:
         """
         self.validated_words.clear()
         try:
-            with open(self.corpus_path, encoding='utf-8') as corpus:
-                lexicon = corpus.readlines()
-                for key, text in self.out_texts.items():
-                    if text and len(text) > 1:
-                        for entry in lexicon:
-                            if text in entry:
-                                self.validated_words[key] = text
+            conn = sqlite3.connect(self.corpus_path)
+            for key, text in self.out_texts.items():
+                if text and len(text) > 1:
+                    cur = conn.cursor()
+                    cur.execute(
+                        'SELECT 1 FROM lexitron_thai WHERE instr(entry, ?) > 0 LIMIT 1', (text,)
+                    )
+                    exists = cur.fetchone() is not None
+                    if exists:
+                        self.validated_words[key] = text
+                    cur.close()
+            conn.close()
         except Exception as e:
             logger.error(f"error accessing corpus: {e}")
             tb_logger.exception(e)
